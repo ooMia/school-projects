@@ -1,0 +1,283 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <div class="timeline">
+    <form id="join-form">
+      <div class="input-group">
+        <label for="join-email">이메일</label>
+        <input id="join-email" type="email" name="email"></div>
+        <div class="input-group" id="auth-num-group" style="display:none;">
+          <label for="auth-num">인증번호 입력</label>
+          <input id="auth-num" type="text" name="auth-num"></div>
+      <div class="input-group">
+        <label for="join-nick">닉네임</label>
+        <input id="join-nick" type="text" name="nick"></div>
+      <div class="input-group">
+        <label for="join-password">비밀번호</label>
+        <input id="join-password" type="password" name="password"></div>
+      <button id="join-btn" type="button" class="btn">회원가입</button>
+    </form>
+  </div>
+
+  <form id="certify-form">
+    <div class="certify-group">
+      <button id="dupcheck-btn" type="button" class="btn" style="display:block;">이메일 중복확인</button>
+      <button id="send-btn" type="button" class="btn" >인증번호 받기</button>
+      <div id="confirm-group">
+        <button id="confirm-btn" type="button" class="btn">인증</button>
+        <div id="timer">
+          <span id="m"></span> : <span id="s"></span>
+        </div>
+      </div>
+    </div>
+  </form>
+<div id="modal">
+  <div id="send-modal">
+    <div id="modal-contents">
+        <h3> <b> 이메일 인증 </b> </h3>
+        <br>
+        <div>
+            <div>
+                '<span id="sended-email"></span>' (으)로<br>
+                6자리 인증번호가 전송되었습니다.
+            </div>
+            <br>
+            <div>
+                이메일을 확인할 수 없나요?<br>
+                <a href="javascript:sendMailAuth();" id="resend-mail"> 인증 메일 다시 보내기 </a>
+            </div>
+        </div>
+        <br>
+        <hr>
+        <input type="button" id="send-check" class="check" value="확인" />
+    </div>
+  </div>
+
+  <div id="confirm-modal">
+    <div id="modal-contents">
+      <br><br><br>
+      <h3> 이메일 인증되었습니다</h3>
+      <br><br><br><br>
+      <hr>
+      <input type="button" id="confirm-check" class="check" value="확인" />
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    window.onload = () => {
+      if (new URL(location.href).searchParams.get('error')) {
+        alert('이미 존재하는 이메일입니다.');
+      }
+    };
+
+    function validateEmailRegex(email){
+      const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+
+      return (email.match(regExp) != null) ? true : false;
+    }
+
+    function validateAuthCodeRegex(authCode){
+      const regExp = /^[0-9]{6}$/;
+
+      return (authCode.match(regExp) != null) ? true : false;
+    }
+
+    function sendMailAuth() {
+      const email = document.querySelector('#join-email').value.trim();
+      document.querySelector('#sended-email').innerHTML = email;
+
+      if(email.length == 0){
+        alert('이메일은 빈칸일 수 없습니다');
+        return;
+      }
+      if(validateEmailRegex(email) != true){
+        alert('이메일 형식에 맞지않습니다. 다시 입력해주세요');
+        return;
+      }
+
+      axios.post("/auth/mail", {
+        receiverEmail : email
+      })
+      .then((res) => {
+        timerInit();
+        timerRun();
+        authNumGroup.style.display = "block";
+        sendModal.style.display = 'block';
+        confirmGroup.style.visibility ="visible";
+      })
+      .catch((res) => {
+        alert("알수없는 오류가 발생했습니다. 다시 시도해주세요.");
+      });
+    }
+
+    function sendAuthCode() {
+      const authCode = document.querySelector('#auth-num').value.trim();
+
+      if(validateAuthCodeRegex(authCode) != true){
+        alert('인증코드는 6자리 숫자입니다. 다시 입력해주세요.');
+        return;
+      }
+      
+      axios.post("/auth/mail/check", {
+        randomCode : authCode
+      })
+      .then((res) => {
+        timerInit();
+        confirmModal.style.display = 'block';
+        authNumGroup.style.display = "none";
+        document.querySelector('.certify-group').style.display = "none";
+        document.querySelector('#auth-num').disabled = true;
+        document.querySelector('#join-email').disabled = true
+      })
+      .catch((res) => {
+          if(res.request.status == 400) {
+            alert("인증 번호가 일치하지 않습니다. 다시 입력해주세요.");
+          } else {
+            alert("알수없는 오류가 발생했습니다. 다시 시도해주세요.");
+          }
+      });
+    }
+
+    function sendJoinReq() {
+      const email = document.querySelector('#join-email').value;
+      const nick = document.querySelector('#join-nick').value;
+      const password = document.querySelector('#join-password').value;
+
+      if(email.length == 0){
+        alert('이메일은 빈칸일 수 없습니다. 처음부터 다시 시도해주세요.');
+        location.reload();
+      }
+      if(validateEmailRegex(email) != true){
+        alert('이메일 형식에 맞지않습니다. 처음부터 다시 시도해주세요.');
+        location.reload();
+      }
+
+      axios.post("/auth/join", {
+        email,
+        nick,
+        password
+      })
+      .then((res) => {
+        alert('회원가입에 성공했습니다.');
+        window.location = '/';
+      })
+      .catch((res) => {
+        if(res.request.status == 403) {
+          alert('인증이 유효하지 않습니다. 처음부터 다시 시도해주세요.');
+        } else if(res.request.status == 400){
+          alert('이미 존재하는 이메일입니다. 처음부터 다시 시도해주세요.');
+        } else {
+          alert('알수없는 오류가 발생했습니다. 처음부터 다시 시도해주세요.');
+        }
+        location.reload();
+      });
+    }
+
+    function sendEmailDupCheck() {
+      const email = document.querySelector('#join-email').value;
+
+      if(email.length == 0){
+        alert('이메일은 빈칸일 수 없습니다');
+        return;
+      }
+      if(validateEmailRegex(email) != true){
+        alert('이메일 형식에 맞지않습니다. 다시 입력해주세요');
+        return;
+      }
+
+      axios.post("/auth/mail/dupcheck", {
+        dupCheckEmail: email
+      })
+      .then(res => {
+        alert('가입가능한 이메일 주소입니다.');
+      })
+      .catch(res => {
+        alert('이미 가입된 이메일 주소입니다.')
+      })
+    }
+
+    const sendModal = document.querySelector('#send-modal');
+    const confirmModal = document.querySelector('#confirm-modal');
+
+    const btnJoin = document.querySelector('#join-btn');
+    const btnDupCheck = document.querySelector('#dupcheck-btn');
+    
+    const btnOpenSendModal = document.querySelector('#send-btn');
+    const btnOpenConfirmModal = document.querySelector('#confirm-btn');
+
+    const btnCloseSendModal = document.querySelector('#send-check');
+    const btnCloseConfirmModal = document.querySelector('#confirm-check');
+    
+    const authNumGroup = document.querySelector('#auth-num-group');
+    const confirmGroup = document.querySelector('#confirm-group');
+
+    btnOpenSendModal.addEventListener('click', () => {
+      sendMailAuth();
+    });
+    
+    btnCloseSendModal.addEventListener('click', () => {
+      sendModal.style.display = "none";
+    });
+
+    btnOpenConfirmModal.addEventListener('click', () => {
+      sendAuthCode();
+    });
+
+    btnCloseConfirmModal.addEventListener('click', () => {
+      confirmModal.style.display = "none";
+    });
+
+    btnJoin.addEventListener('click', () => {
+      sendJoinReq();
+    })
+
+    btnDupCheck.addEventListener('click', () => {
+      sendEmailDupCheck();
+    })
+    
+    let timerIntervalIds = []
+
+    const timerInit = () => {
+      timerIntervalIds.forEach(tid => clearInterval(tid));
+    }
+
+    const timerRun = () => {
+      btnOpenConfirmModal.disabled = false;
+      let sec = 00;
+      let min = 03;
+      const min_area = document.getElementById("m");
+      const sec_area = document.getElementById("s");
+      if( sec.toString().length == 1 ) { sec = "0"+sec; }
+
+      min_area.innerHTML = min;
+      sec_area.innerHTML = sec;
+
+      min--;
+      min_area.innerHTML=min;
+      sec=59;
+      sec_area.innerHTML=sec;
+
+      timer = setInterval(function () {
+        sec--;
+        if( sec.toString().length == 1 ) { sec = "0"+sec; }
+        sec_area.innerHTML=sec;
+        if(sec==59){
+          min--;
+          min_area.innerHTML=min;
+        }
+        if(sec==00) {
+          sec=60;           
+          if(min==0) {
+            btnOpenConfirmModal.disabled = true;
+            clearInterval(timer);
+            alert("인증 시간이 초과되었습니다.");
+          }
+        }
+      }, 1000)
+      timerIntervalIds.push(timer);
+    };
+  </script>
+{% endblock %}

@@ -1,0 +1,100 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 112px;
+    height: 40px;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.75rem;
+    background-color: white;
+    transition: all 0.4s;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    cursor: pointer;
+}
+
+/*.container:hover {*/
+/*    background-color: #002870;*/
+/*    border: 1px solid #002870;*/
+/*    color: white;*/
+/*}*/
+
+.dropdownContainer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.75rem;
+    background-color: white;
+    z-index: 999;
+    margin-top: 10px;
+    transition: all 0.4s;
+}
+
+.dropdownTitle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.dropdownItemContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.dropdownItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    height: 40px;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.75rem;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+
+    transition: all 0.2s;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.dropdownItemSelected, .dropdownItemHover {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+    height: 40px;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.75rem;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+    background-color: #002870;
+    color: white;
+
+    transition: all 0.2s;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

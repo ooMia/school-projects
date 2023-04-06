@@ -1,0 +1,26 @@
+.container {
+    position: relative;
+}
+
+.background1 {
+    width: 120vw;
+    height: 100vh;
+    background-color: #002870;
+    border-radius: 400vmax / 130vmax;
+    rotate: 20deg;
+    position: relative;
+    left: -14vw;
+    box-shadow: rgba(100, 100, 111, 1) 0 7px 29px 0;
+    z-index: 1;
+}
+
+.background2 {
+    width: 120vw;
+    height: 100vh;
+    background-color: #DDF6FF;
+    border-radius: 400vmax / 130vmax;
+    rotate: -20deg;
+    position: absolute;
+    left: -14vw;
+    top: 58vh;
+}

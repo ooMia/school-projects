@@ -1,0 +1,74 @@
+.card {
+    width: 300px;
+    height: 200px;
+    padding: 24px;
+    background-color: white;
+    border-radius: 10%;
+    border: 1px solid #E5E5E5;
+    cursor: pointer;
+}
+
+.frontContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    z-index: 10;
+}
+
+.backContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: scroll;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.backContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.title {
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+    /*margin-top: 5px;*/
+    /*margin-bottom: 10px;*/
+}
+
+.tagContainer {
+    margin-bottom: 10px;
+}
+
+.professor {
+
+}
+
+.classroom {
+
+}
+
+.time {
+
+}
+
+.icon {
+    position: absolute;
+    top: 12px;
+    right: 28px;
+}
+
+.contentFont {
+    color: black;
+    font-size: 14px
+}
+
+.cardBackground {
+    font-size: 100px;
+    font-weight: bold;
+    color: #002B70;
+    position: absolute;
+    z-index: 1;
+    bottom: -24px;
+    right: 20px;
+}

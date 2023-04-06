@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div class="find-pw">
+        <form id="find-pw-form">
+            <div> 비밀번호를 변경할 계정의 이메일을 입력하세요 </div><br>
+            <div class="certify-group">
+              <button id="send-btn" type="button" class="btn">인증번호 받기</button>
+              <div id="confirm-group">
+                <button id="confirm-btn" type="button" class="btn">인증</button>
+                <div id="timer"><span id="m"></span> : <span id="s"></span></div>
+              </div>
+            </div>
+            <div class="input-group">
+                <label for="email">이메일</label>
+                <input id="email" type="email" name="email" required autofocus>
+            </div>
+            <div class="input-group">
+                <label for="email">인증번호 입력</label>
+                <input id="auth-code" type="text" name="auth-code" required autofocus>
+            </div>
+            <button id="home-btn" type="button" class="btn">홈으로 돌아가기</button>
+        </form>
+
+        <div id="send-modal">
+          <div id="modal-contents">
+              <h3> <b> 이메일 인증 </b> </h3>
+              <br>
+              <div>
+                  <div>
+                      '<span id="sended-email"></span>'(으)로<br>
+                      6자리 인증번호가 전송되었습니다.
+                  </div>
+                  <br>
+                  <div>
+                      이메일을 확인할 수 없나요?<br>
+                      <a href="javascript:sendMailAuth()" id="resend-mail"> 인증 메일 다시 보내기 </a>
+                  </div>
+              </div>
+              <br>
+              <hr>
+              <input type="button" id="send-check" class="check" value="확인" />
+          </div>
+        </div>
+      
+        <div id="confirm-modal">
+          <div id="modal-contents">
+            <br><br><br>
+            <h3> 이메일 인증되었습니다</h3>
+            <br><br><br><br>
+            <hr>
+            <input type="button" id="confirm-check" class="check" value="확인" />
+          </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    function validateEmailRegex(email){
+      const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+
+      return (email.match(regExp) != null) ? true : false;
+    }
+
+    function validateAuthCodeRegex(authCode){
+      const regExp = /^[0-9]{6}$/;
+
+      return (authCode.match(regExp) != null) ? true : false;
+    }
+
+    function sendMailAuth() {
+      const email = document.querySelector('#email').value.trim();
+      document.querySelector('#sended-email').innerHTML = email;
+
+      if(email.length == 0){
+        alert('이메일은 빈칸일 수 없습니다');
+        return;
+      }
+      if(validateEmailRegex(email) != true){
+        alert('이메일 형식에 맞지않습니다. 다시 입력해주세요');
+        return;
+      }
+
+      axios.post("/auth/mail", {
+        receiverEmail : email
+      })
+      .then((res) => {
+        timerInit();
+        timerRun();
+        sendModal.style.display = 'block';
+        confirmGroup.style.visibility ="visible";
+      })
+      .catch((res) => {
+        alert("알수없는 오류가 발생했습니다. 다시 시도해주세요.");
+      });
+    }
+
+    function sendAuthCode() {
+      const authCode = document.querySelector('#auth-code').value.trim();
+
+      if(validateAuthCodeRegex(authCode) != true){
+        alert('인증코드는 6자리 숫자입니다. 다시 입력해주세요.');
+        return;
+      }
+      
+      axios.post("/auth/mail/check", {
+        randomCode : authCode
+      })
+      .then((res) => {
+        timerInit();
+        confirmModal.style.display = 'block';
+      })
+      .catch((res) => {
+          if(res.request.status == 400) {
+            alert("인증 번호가 일치하지 않습니다. 다시 입력해주세요.");
+          } else {
+            alert("알수없는 오류가 발생했습니다. 다시 시도해주세요.");
+          }
+      });
+    }
+
+    const sendModal = document.querySelector('#send-modal');
+    const confirmModal = document.querySelector('#confirm-modal');
+    
+    const btnOpenSendModal = document.querySelector('#send-btn');
+    const btnOpenConfirmModal = document.querySelector('#confirm-btn');
+
+    const btnCloseSendModal = document.querySelector('#send-check');
+    const btnCloseConfirmModal = document.querySelector('#confirm-check');
+
+    const confirmGroup = document.querySelector('#confirm-group');
+
+    const btnReturnHome = document.querySelector('#home-btn');
+
+    btnOpenSendModal.addEventListener('click', () => {
+      sendMailAuth();
+    });
+    
+    btnCloseSendModal.addEventListener('click', () => {
+      sendModal.style.display = "none";
+    });
+
+    btnOpenConfirmModal.addEventListener('click', () => {
+      sendAuthCode();
+    });
+
+    btnCloseConfirmModal.addEventListener('click', () => {
+      confirmModal.style.display = "none";
+      window.location = '/resetPW';
+    });
+
+    btnReturnHome.addEventListener('click', () => {
+      window.location = '/'
+    })
+    
+    let timerIntervalIds = []
+
+    const timerInit = () => {
+      timerIntervalIds.forEach(tid => clearInterval(tid));
+    }
+
+    const timerRun = () => {
+      btnOpenConfirmModal.disabled = false;
+      let sec = 00;
+      let min = 03;
+      const min_area = document.getElementById("m");
+      const sec_area = document.getElementById("s");
+      if( sec.toString().length == 1 ) { sec = "0"+sec; }
+
+      min_area.innerHTML = min;
+      sec_area.innerHTML = sec;
+
+      min--;
+      min_area.innerHTML=min;
+      sec=59;
+      sec_area.innerHTML=sec;
+
+      timer = setInterval(function () {
+        sec--;
+        if( sec.toString().length == 1 ) { sec = "0"+sec; }
+        sec_area.innerHTML=sec;
+        if(sec==59){
+          min--;
+          min_area.innerHTML=min;
+        }
+        if(sec==00) {
+          sec=60;           
+          if(min==0) {
+            btnOpenConfirmModal.disabled = true;
+            clearInterval(timer);
+            alert("인증 시간이 초과되었습니다.");
+          }
+        }
+      }, 1000)
+      timerIntervalIds.push(timer);
+    };
+</script>

@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+}
+
+.gnbWrap {
+    display: flex;
+    align-self: center;
+}
+
+.gnbMenuRight {
+    margin-right: 8vw;
+}
+
+.gnbMenuLeft {
+    margin-left: 8vw;
+}
+
+.info {
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+}

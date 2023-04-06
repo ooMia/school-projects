@@ -1,0 +1,109 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 112px;
+    height: 40px;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.75rem;
+    background-color: white;;
+    transition: all 0.4s;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    cursor: pointer;
+}
+
+.container:hover {
+    background-color: #002870;
+    border: 1px solid #002870;
+    color: white;
+}
+
+.dropdownContainer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.75rem;
+    background-color: white;
+    z-index: 999;
+    margin-top: 10px;
+    right: 6vw;
+    transition: all 0.2s;
+}
+
+.dropdownTitle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.dropdownItemContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.dropdownItemTitle {
+    display: flex;
+    flex-direction: row;
+    margin-left: 16px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.dropdownItem {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0.75rem;
+    cursor: pointer;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.dropdownItemSubContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #F6F6F6;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), padding 0.2s;
+    border-radius: 0.75rem;
+}
+
+.dropdownItemSubContainerSelected {
+    display: flex;
+    flex-direction: column;
+    background-color: #F6F6F6;
+    max-height: 200px;
+    transition: max-height 0.1s cubic-bezier(0, 0.5, 0, 0.5), padding 0.2s;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 0.75rem;
+    overflow-y: scroll;
+}
+
+.dropdownItemSub {
+    display: flex;
+    flex-direction: row;
+    width: 22%;
+    justify-content: space-between;
+    margin-left: 16px;
+}

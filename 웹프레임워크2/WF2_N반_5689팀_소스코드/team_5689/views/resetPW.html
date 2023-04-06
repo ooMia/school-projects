@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <script>
+    function confirm_handler() {
+      const set_password = document.querySelector('.set_password').value;
+      const confirm_password = document.querySelector('.Confirm_password').value;
+
+      if(set_password.length == 0){
+        alert("비밀번호 설정 칸에 값을 입력해주세요");
+        return;
+      } else if(confirm_password.length == 0){
+        alert("비밀번호 확인 칸에 값을 입력해주세요");
+        return;
+      }
+
+      if(set_password == confirm_password){
+        axios.post("/auth/reset", {
+          password : set_password
+        })
+        .then(function(res) {
+          alert("비밀번호 재설정에 성공했습니다. 다시 로그인해주세요.");
+          window.location.href = '/';
+        })
+        .catch(function(res) {
+          alert("가입되어있지 않는 email이거나 알수없는 오류가 발생했습니다.");
+        })
+      } else {
+        alert("입력한 비밀번호와 비밀번호 확인이 서로 다릅니다. 다시 입력해주세요.");
+      }
+    }
+  </script>
+  <body>
+    <div class="reset-pw">
+      <form id="password-form">
+        <div class="input-group">
+          <label for="set_password">비밀번호 설정</label>
+          <input id="set_password" type="password" name="set_password" class="set_password" required autofocus>
+        </div>
+        <div class="input-group">
+          <label for="Confirm password">비밀번호 확인</label>
+          <input id="Confirm password" type="password" name="Confirm_password" class="Confirm_password" required>
+        </div>
+        <div align = "center">
+        <button id="confirm" type="button" class="btn" onclick="javascript:confirm_handler();return false;">확인</button>
+        </div>
+      </form>
+    </div>
+  </body>
+    <script>
+      function pressConfirm(event) {
+        if(event.key === "Enter") {
+          event.preventDefault();
+          document.getElementById("confirm").click();
+        };
+      }
+
+      document.getElementById("set_password")
+        .addEventListener("keypress", pressConfirm);
+      document.getElementById("Confirm password")
+        .addEventListener("keypress", pressConfirm);
+    </script>
